@@ -44,13 +44,13 @@ void handlereq(int fd){
 	sscanf(buf, "%s %s %s", method, uri, version);
 
 	if(strcmp(uri,"/")==0){
-		strcpy(filename, "public/index.html");
+		strcpy(filename, "web/index.html");
 	}
 
-	if(strcmp(uri,"/favicon.ico")==0){
+	/*if(strcmp(uri,"/favicon.ico")==0){
 		strcpy(filename, "public/favicon.ico");
 		//return;
-	}
+	}*/
 
 	if(stat(filename, &sbuf)<0){
 		printf("Error opening file: %i", errno);

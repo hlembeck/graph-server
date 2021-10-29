@@ -86,3 +86,8 @@ void servepage(int fd, char *filename, int filesize){
 	munmap(srcp, filesize);
 	return;
 }
+
+void servepage_dynamic(){
+
+	return;
+}

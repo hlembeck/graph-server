@@ -4,6 +4,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <sys/mman.h>
+#include <stdlib.h>
 
 #include <stdio.h>
 
@@ -23,3 +24,4 @@ void rio_readinitb(rio_t *rp, int fd);
 void initial2char(char *buf, char stop, char *res);
 void str_reverse(char *in);
 void final2char(char *buf, char stop, char *res);
+void ftype(char *filename, char *out);

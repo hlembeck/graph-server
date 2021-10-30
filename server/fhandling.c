@@ -114,3 +114,37 @@ void final2char(char *in, char stop, char *out){
 	str_reverse(out);
 	return;
 }
+
+void ftype(char *filename, char *out){
+	char fext[RIO_BUFSIZE];
+	final2char(filename, '.', fext);
+
+	/* Content-Type: text */
+	if(strcmp(fext, "html")==0){
+		strcpy(out, "text/html");
+	}
+	//printf("\ntest1\n");
+	else if(strcmp(fext, "css")==0){
+		strcpy(out, "text/css");
+	}
+	else if(strcmp(fext, "csv")==0){
+		strcpy(out, "text/csv");
+	}
+	else if(strcmp(fext, "xml")==0){
+		strcpy(out, "text/xml");
+	}
+
+	/* Content-Type: application */
+	else if(strcmp(fext, "js")==0){
+		strcpy(out, "application/json");
+	}
+	else if(strcmp(fext, "json")==0){
+		strcpy(out, "application/json");
+	}
+	else{
+		strcpy(out, "text/plain");
+	}
+	memset(fext, '\0', sizeof(fext));
+	/* File extension not handled */
+	return;
+}

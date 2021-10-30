@@ -2,7 +2,7 @@
 #include "fhandling.h"
 
 void handlereq(int connfd);
-void servetext(int fd, char *filename, int filesize);
+void servestatic(int fd, char *filename, int filesize);
 void serveapplication(int fd, char *filename, int filesize);
 void serveimage(int fd, char *filename, int filesize);
 void servedynamic(int fd, char *filename, int filesize);
@@ -61,26 +61,14 @@ void handlereq(int fd){
 	}
 	printf("Opened file %s.\n", filename);
 	printf("st_mode: %o\n", sbuf.st_mode);
-	servetext(fd, filename, sbuf.st_size);
+	servestatic(fd, filename, sbuf.st_size);
 	return;
 }
 
-void servetext(int fd, char *filename, int filesize){
+void servestatic(int fd, char *filename, int filesize){
 	int srcfd;
 	char *srcp;
 	char buf[MAXBUF];
-	
-	/*
-	sprintf(buf, "HTTP/1.0 200 OK\r\n");
-	sprintf(buf, "%sServer: Custom Web Server\r\n", buf);
-	sprintf(buf, "%sConnection: closed\r\n", buf);
-	sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
-	sprintf(buf, "%sContent-Type: text/html\r\n\r\n", buf);
-	rio_writen(fd, buf, strlen(buf));
-	printf("Response Headers:\n");
-	printf("%s",buf);
-	*/
-	
 
 	writeheader(fd, filename, filesize);
 

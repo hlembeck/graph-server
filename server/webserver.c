@@ -2,25 +2,23 @@
 #include "fhandling.h"
 
 void handlereq(int connfd);
-void servepage(int fd, char *filename, int filesize);
+void servetext(int fd, char *filename, int filesize);
+void serveapplication(int fd, char *filename, int filesize);
+void serveimage(int fd, char *filename, int filesize);
+void servedynamic(int fd, char *filename, int filesize);
+void writeheader(int fd, char *filename, int filesize);
 
 int main(int argc, char **argv){
 	if(argc != 2){
 		printf("Please enter the port number for listening, as a command line argument.\n");
 		return -1;
 	}
-
 	int listenfd, connfd;
 	char hostname[MAXHP], port[MAXHP];
 	struct sockaddr_storage clientaddr;
 	socklen_t clientlen = sizeof(clientaddr);
 
 	listenfd = open_listenfd(argv[1]);
-	char *test = "test.none";
-	char res[10];
-	//memset(res, '\0', 10);
-	final2char(test, '.', res);
-	printf("%s\n", res);
 
 	while(1){
 		connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &clientlen);
@@ -35,7 +33,10 @@ void handlereq(int fd){
 	struct stat sbuf;
 	char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
 	char filename[MAXLINE];
+	int ftype;
 	rio_t rio;
+
+	strcpy(filename, "web");
 
 	rio_readinitb(&rio, fd);
 	rio_readlineb(&rio, buf, MAXLINE);
@@ -43,8 +44,10 @@ void handlereq(int fd){
 	printf("%s", buf);
 	sscanf(buf, "%s %s %s", method, uri, version);
 
-	if(strcmp(uri,"/")==0){
-		strcpy(filename, "web/index.html");
+	if(strcmp(uri,"/")==0)
+		strcat(filename, "/index.html");
+	else{
+		strcat(filename, uri);
 	}
 
 	/*if(strcmp(uri,"/favicon.ico")==0){
@@ -58,17 +61,16 @@ void handlereq(int fd){
 	}
 	printf("Opened file %s.\n", filename);
 	printf("st_mode: %o\n", sbuf.st_mode);
-	if(strcmp(filename,"public/favicon.ico")==0){
-		return;
-	}
-	servepage(fd, filename, sbuf.st_size);
+	servetext(fd, filename, sbuf.st_size);
 	return;
 }
 
-void servepage(int fd, char *filename, int filesize){
+void servetext(int fd, char *filename, int filesize){
 	int srcfd;
 	char *srcp;
 	char buf[MAXBUF];
+	
+	/*
 	sprintf(buf, "HTTP/1.0 200 OK\r\n");
 	sprintf(buf, "%sServer: Custom Web Server\r\n", buf);
 	sprintf(buf, "%sConnection: closed\r\n", buf);
@@ -77,6 +79,10 @@ void servepage(int fd, char *filename, int filesize){
 	rio_writen(fd, buf, strlen(buf));
 	printf("Response Headers:\n");
 	printf("%s",buf);
+	*/
+	
+
+	writeheader(fd, filename, filesize);
 
 	srcfd = open(filename, O_RDONLY, 0);
 	srcp = mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
@@ -87,7 +93,30 @@ void servepage(int fd, char *filename, int filesize){
 	return;
 }
 
-void servepage_dynamic(){
+void serveapplication(int fd, char *filename, int filesize){
 
+	return;
+}
+
+void serveimage(int fd, char *filename, int filesize){
+
+	return;
+}
+
+void servedynamic(int fd, char *filename, int filesize){
+	return;
+}
+
+void writeheader(int fd, char *filename, int filesize){
+	char buf[MAXBUF], typeheader[MAXBUF];
+	sprintf(buf, "HTTP/1.0 200 OK\r\n");
+	sprintf(buf, "%sServer: Lem's Custom Web Server\r\n", buf);
+	sprintf(buf, "%sConnection: close\r\n", buf);
+	sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
+	ftype(filename, typeheader);
+	sprintf(buf, "%sContent-Type: %s\r\n\r\n", buf, typeheader);
+	printf("Response Headers:\n");
+	printf("%s",buf);
+	rio_writen(fd, buf, strlen(buf));
 	return;
 }

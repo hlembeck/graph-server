@@ -1,5 +1,6 @@
 #include "serverwrappers.h"
 #include "fhandling.h"
+#include "controlwrappers.h"
 
 void handlereq(int connfd);
 void servestatic(int fd, char *filename, int filesize);
@@ -9,6 +10,7 @@ void servedynamic(int fd, char *filename, int filesize);
 void writeheader(int fd, char *filename, int filesize);
 
 int main(int argc, char **argv){
+	pid_t pid;
 	if(argc != 2){
 		printf("Please enter the port number for listening, as a command line argument.\n");
 		return -1;
@@ -21,10 +23,15 @@ int main(int argc, char **argv){
 	listenfd = open_listenfd(argv[1]);
 
 	while(1){
+		ReapChildren();
 		connfd = accept(listenfd, (struct sockaddr *)&clientaddr, &clientlen);
-		getnameinfo((struct sockaddr *)&clientaddr, clientlen, hostname, MAXHP, port, MAXHP, 0);
-		printf("Accepted connection from (%s,%s).\n", hostname, port);
-		handlereq(connfd);
+		if(Fork()==0){
+			getnameinfo((struct sockaddr *)&clientaddr, clientlen, hostname, MAXHP, port, MAXHP, 0);
+			printf("Accepted connection from (%s,%s).\n", hostname, port);
+			handlereq(connfd);
+			close(connfd);
+			exit(0);
+		}
 		close(connfd);
 	}
 }
@@ -36,6 +43,7 @@ void handlereq(int fd){
 	int ftype;
 	rio_t rio;
 
+	/* Web files (.html, .css, .js, etc.) are stored in web folder */
 	strcpy(filename, "web");
 
 	rio_readinitb(&rio, fd);
@@ -49,11 +57,6 @@ void handlereq(int fd){
 	else{
 		strcat(filename, uri);
 	}
-
-	/*if(strcmp(uri,"/favicon.ico")==0){
-		strcpy(filename, "public/favicon.ico");
-		//return;
-	}*/
 
 	if(stat(filename, &sbuf)<0){
 		printf("Error opening file: %i", errno);
@@ -76,18 +79,7 @@ void servestatic(int fd, char *filename, int filesize){
 	srcp = mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
 	close(srcfd);
 	rio_writen(fd, srcp, filesize);
-	printf("%s\n", srcp);
 	munmap(srcp, filesize);
-	return;
-}
-
-void serveapplication(int fd, char *filename, int filesize){
-
-	return;
-}
-
-void serveimage(int fd, char *filename, int filesize){
-
 	return;
 }
 

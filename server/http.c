@@ -123,19 +123,22 @@ void setquery(HTTP_Request *hset, char *uri){
 	unsigned short start, i=0, count=0;
 	while(uri[i]!='\0'){
 		if(uri[i]=='?'){
-			path = malloc(i);
-			memcpy(path, uri, i-1);
+			path = malloc(i+1);
+			memcpy(path, uri, i);
 			path[i] = '\0';
+			printf("path: %s\n\n", path);
 			hset->path = path;
 			count++;
-			start=i++;
+			printf("count of args: %i\n\n", count);
+			start=++i;
 			continue;
 		}
 		if(uri[i]=='&'){
-			char *arg = malloc(i-start);
-			memcpy(arg, uri+start, i-start-1);
-			arg[i-start-1] = '\0';
-			i++;
+			char *arg = malloc(i-start+1);
+			memcpy(arg, uri+start, i-start);
+			arg[i-start] = '\0';
+			query[count-1] = arg;
+			start=++i;
 			count++;
 			continue;
 		}
@@ -144,6 +147,12 @@ void setquery(HTTP_Request *hset, char *uri){
 	if(count == 0){
 		path = malloc(strlen(uri));
 		strcpy(path, uri);
+	}
+	else{
+		char *arg = malloc(i-start+1);
+		memcpy(arg,  uri+start, i-start);
+		arg[i-start] = '\0';
+		query[count-1] = arg;
 	}
 	hset->path = path;
 	hset->query = query;

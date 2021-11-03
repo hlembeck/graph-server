@@ -1,6 +1,6 @@
 #include "serverwrappers.h"
-#include "fhandling.h"
 #include "controlwrappers.h"
+#include "http.h"
 
 void handlereq(int connfd);
 void servestatic(int fd, char *filename, int filesize);
@@ -8,6 +8,9 @@ void serveapplication(int fd, char *filename, int filesize);
 void serveimage(int fd, char *filename, int filesize);
 void servedynamic(int fd, char *filename, int filesize);
 void writeheader(int fd, char *filename, int filesize);
+void servenonfile(int fd, char *uri, rio_t *rio, char *method);
+void parse_request(int fd, rio_t *rio);
+void handleGET(HTTP_Request *hset, int fd);
 
 int main(int argc, char **argv){
 	pid_t pid;
@@ -38,34 +41,38 @@ int main(int argc, char **argv){
 
 void handlereq(int fd){
 	struct stat sbuf;
-	char buf[MAXLINE], method[MAXLINE], uri[MAXLINE], version[MAXLINE];
+	char buf[MAXLINE], uri[MAXLINE], method[MAXLINE];
 	char filename[MAXLINE];
 	int ftype;
 	rio_t rio;
 
 	/* Web files (.html, .css, .js, etc.) are stored in web folder */
 	strcpy(filename, "web");
-
 	rio_readinitb(&rio, fd);
-	rio_readlineb(&rio, buf, MAXLINE);
-	printf("Request headers:\n");
-	printf("%s", buf);
-	sscanf(buf, "%s %s %s", method, uri, version);
+	HTTP_Request *hset = parserequest(&rio);
+	printrequest(hset);
+	handleGET(hset, fd);
+	freerequest(hset);
+	return;
+}
 
-	if(strcmp(uri,"/")==0)
+void handleGET(HTTP_Request *hset, int fd){
+	struct stat sbuf;
+	char filename[MAXLINE];
+	/* Web files (.html, .css, .js, etc.) are stored in web folder */
+	strcpy(filename, "web");
+	if(strcmp(hset->uri,"/") == 0)
 		strcat(filename, "/index.html");
-	else{
-		strcat(filename, uri);
-	}
+	else
+		strcat(filename, hset->uri);
 
 	if(stat(filename, &sbuf)<0){
-		printf("Error opening file: %i", errno);
+		printf("Error opening file: %i\n", errno);
 		return;
 	}
 	printf("Opened file %s.\n", filename);
 	printf("st_mode: %o\n", sbuf.st_mode);
 	servestatic(fd, filename, sbuf.st_size);
-	return;
 }
 
 void servestatic(int fd, char *filename, int filesize){
@@ -73,7 +80,7 @@ void servestatic(int fd, char *filename, int filesize){
 	char *srcp;
 	char buf[MAXBUF];
 
-	writeheader(fd, filename, filesize);
+	writeheaders(fd, filename, filesize);
 
 	srcfd = open(filename, O_RDONLY, 0);
 	srcp = mmap(0, filesize, PROT_READ, MAP_PRIVATE, srcfd, 0);
@@ -83,20 +90,10 @@ void servestatic(int fd, char *filename, int filesize){
 	return;
 }
 
-void servedynamic(int fd, char *filename, int filesize){
+void servenonfile(int fd, char *uri, rio_t *rio, char *method){
 	return;
 }
 
-void writeheader(int fd, char *filename, int filesize){
-	char buf[MAXBUF], typeheader[MAXBUF];
-	sprintf(buf, "HTTP/1.0 200 OK\r\n");
-	sprintf(buf, "%sServer: Lem's Custom Web Server\r\n", buf);
-	sprintf(buf, "%sConnection: close\r\n", buf);
-	sprintf(buf, "%sContent-Length: %d\r\n", buf, filesize);
-	ftype(filename, typeheader);
-	sprintf(buf, "%sContent-Type: %s\r\n\r\n", buf, typeheader);
-	printf("Response Headers:\n");
-	printf("%s",buf);
-	rio_writen(fd, buf, strlen(buf));
+void servedynamic(int fd, char *filename, int filesize){
 	return;
 }

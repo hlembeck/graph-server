@@ -1,7 +1,4 @@
-#include <sys/types.h>
-#include <unistd.h>
-#include <stdlib.h>
-#include <stdio.h>
+#include "controlwrappers.h"
 
 pid_t Fork(void){
 	pid_t pid;

@@ -6,11 +6,11 @@
 #include <stdio.h>
 #include <sys/stat.h>
 
-//addrinfo struct is in netdb
+/* addrinfo struct */
 #include <netdb.h>
 
 #define MAXHP 128 /* HP means "Host/Port" */
-#define MAXLINE 8192
+#define MAXLINE 16384
 #define MAXBUF 2048
 #define LISTENQ 0
 

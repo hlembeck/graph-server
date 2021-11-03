@@ -148,3 +148,17 @@ void ftype(char *filename, char *out){
 	/* File extension not handled */
 	return;
 }
+
+void read_http_header(rio_t *rio){
+	char buf[MAXLINE];
+	ssize_t rlen = rio_readlineb(rio, buf, MAXLINE);
+	while(rlen > 0){
+		if(strcmp(buf,"\r\n\0")==0){
+			printf("DONE \n");
+			break;
+		}
+		printf("READ %ld BYTES: %s\n", rlen, buf);
+		rlen = rio_readlineb(rio, buf, MAXLINE);
+	}
+	return;
+}

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 #include "matrix.h"
 #include "../file-handling/fhandling.h"
 

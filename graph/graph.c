@@ -159,40 +159,59 @@ void deletebasicgraph(struct basicgraph *g){
 
 void printbasicgraphJSON(struct basicgraph g){
 
-	//char buf[16384];
+	char buf[16384];
+	memset(buf, '\0', 16384);
+	sprintf(buf, "{\"vertices\":[");
+	for(int i=0;i<g.vlen;i++){
+		if(i==g.vlen-1)
+			sprintf(buf, "%s%d", buf, g.vertices[i]);
+		else
+			sprintf(buf, "%s%d,", buf, g.vertices[i]);
+	}
+	sprintf(buf, "%s],\"edges\":[", buf);
+	for(int i=0;i<g.elen;i++){
+		if(i==g.elen-1)
+			sprintf(buf, "%s[%d,%d]", buf, g.edges[i].initial, g.edges[i].final);
+		else
+			sprintf(buf, "%s[%d,%d],", buf, g.edges[i].initial, g.edges[i].final);
+	}
+	sprintf(buf, "%s]}", buf);
 
 	printf("HTTP/1.0 200 OK\r\n");
 	printf("Server: Lem's Custom Web Server\r\n");
 	printf("Connection: close\r\n");
-	//printf("Content-Length: %d\r\n\r\n", 0);
+	printf("Content-Length: %ld\r\n", strlen(buf));
 	printf("Content-Type: application/json\r\n\r\n");
+	printf("%s", buf);
 
-
-	printf("{vertices:[");
+	// 23 chars not including ints 
+	/*
+	printf("{\"vertices\":\"["); // 14
 	for(int i=0;i<g.vlen;i++){
 		if(i==g.vlen-1)
-			printf("%d", g.vertices[i]);
+			printf("%d", g.vertices[i]); // 
 		else
-			printf("%d,", g.vertices[i]);
+			printf("%d,", g.vertices[i]); // 1
 	}
-	printf("],edges:[");
+	printf("],\"edges\":\"["); // 13
 	for(int i=0;i<g.elen;i++){
 		if(i==g.elen-1)
-			printf("[%d,%d]", g.edges[i].initial, g.edges[i].final);
+			printf("[%d,%d]", g.edges[i].initial, g.edges[i].final); // 3
 		else
-			printf("[%d,%d],", g.edges[i].initial, g.edges[i].final);
+			printf("[%d,%d],", g.edges[i].initial, g.edges[i].final); // 4
 	}
-	printf("]}\r\n");
+	printf("]\"}"); // 3
+	*/
 
 	/*
 	sprintf(buf, "HTTP/1.0 200 OK\r\n");
 	sprintf(buf, "%sServer: Lem's Custom Web Server\r\n", buf);
-	sprintf(buf, "%sConnection: close\r\n", buf);
-	sprintf(buf, "%sContent-Length: %d\r\n", buf, 0);
-	*/
-	//sprintf(buf, "%sContent-Type: %s\r\n\r\n", buf, typeheader);
+	sprintf(buf, "%sConnection: close\r\n\r\n", buf);
+	sprintf(buf, "%sContent-Length: %d\r\n", buf, 2);
+	sprintf(buf, "%sContent-Type: text/plain%s\r\n\r\n", buf);
 	//sprintf(buf, "%sContent-Type: application/json\r\n\r\n", buf);
-
+	sprintf(buf, "%sab", buf);
+	*/
 	/*
 	sprintf(buf, "{vertices:[");
 	for(int i=0;i<g.vlen;i++){
@@ -209,7 +228,8 @@ void printbasicgraphJSON(struct basicgraph g){
 			sprintf(buf, "%s[%d,%d],", buf, g.edges[i].initial, g.edges[i].final);
 	}
 	sprintf(buf, "%s]}\n", buf);
-	rio_writen(STDOUT_FILENO, buf, strlen(buf));
 	*/
+	//rio_writen(STDOUT_FILENO, buf, strlen(buf));
+	
 	return;
 }

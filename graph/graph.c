@@ -159,31 +159,48 @@ void deletebasicgraph(struct basicgraph *g){
 
 void printbasicgraphJSON(struct basicgraph g){
 
-	//char buf[16384];
+	char buf[16384];
+	memset(buf, '\0', 16384);
+	sprintf(buf, "{\"vertices\":[");
+	for(int i=0;i<g.vlen;i++){
+		if(i==g.vlen-1)
+			sprintf(buf, "%s%d", buf, g.vertices[i]);
+		else
+			sprintf(buf, "%s%d,", buf, g.vertices[i]);
+	}
+	sprintf(buf, "%s],\"edges\":[", buf);
+	for(int i=0;i<g.elen;i++){
+		if(i==g.elen-1)
+			sprintf(buf, "%s[%d,%d]", buf, g.edges[i].initial, g.edges[i].final);
+		else
+			sprintf(buf, "%s[%d,%d],", buf, g.edges[i].initial, g.edges[i].final);
+	}
+	sprintf(buf, "%s]}", buf);
 
 	printf("HTTP/1.0 200 OK\r\n");
 	printf("Server: Lem's Custom Web Server\r\n");
 	printf("Connection: close\r\n");
-	printf("Content-Length: %d\r\n\r\n", 0); // 23 + g.vlen + 2*g.elen
-	printf("Content-Type: text/plain\r\n\r\n");
+	printf("Content-Length: %ld\r\n", strlen(buf));
+	printf("Content-Type: application/json\r\n\r\n");
+	printf("%s", buf);
 
 	// 23 chars not including ints 
 	/*
-	printf("{vertices:["); // 11
+	printf("{\"vertices\":\"["); // 14
 	for(int i=0;i<g.vlen;i++){
 		if(i==g.vlen-1)
 			printf("%d", g.vertices[i]); // 
 		else
 			printf("%d,", g.vertices[i]); // 1
 	}
-	printf("],edges:["); //9 
+	printf("],\"edges\":\"["); // 13
 	for(int i=0;i<g.elen;i++){
 		if(i==g.elen-1)
 			printf("[%d,%d]", g.edges[i].initial, g.edges[i].final); // 3
 		else
 			printf("[%d,%d],", g.edges[i].initial, g.edges[i].final); // 4
 	}
-	printf("]}\r\n"); //4
+	printf("]\"}"); // 3
 	*/
 
 	/*

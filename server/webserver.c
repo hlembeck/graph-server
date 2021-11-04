@@ -11,6 +11,7 @@ void writeheader(int fd, char *filename, int filesize);
 void servenonfile(int fd, char *uri, rio_t *rio, char *method);
 void parse_request(int fd, rio_t *rio);
 void handleGET(HTTP_Request *hset, int fd);
+void handlePOST(HTTP_Request *hset, int fd);
 
 int main(int argc, char **argv){
 	pid_t pid;
@@ -51,7 +52,12 @@ void handlereq(int fd){
 	rio_readinitb(&rio, fd);
 	HTTP_Request *hset = parserequest(&rio);
 	printrequest(hset);
-	handleGET(hset, fd);
+	if(strcmp(hset->method,"GET")==0){
+		handleGET(hset, fd);
+	}
+	else{
+		handlePOST(hset, fd);
+	}
 	freerequest(hset);
 	return;
 }
@@ -73,6 +79,24 @@ void handleGET(HTTP_Request *hset, int fd){
 	printf("Opened file %s.\n", filename);
 	printf("st_mode: %o\n", sbuf.st_mode);
 	servestatic(fd, filename, sbuf.st_size);
+}
+
+void handlePOST(HTTP_Request *hset, int fd){
+	char **argv = malloc(sizeof(char *)*(hset->qlen+2));
+	argv[0] = "../graph/main";
+	argv[hset->qlen+1] = NULL;
+	for(int i=0;i<hset->qlen;i++){
+		argv[i+1] = hset->query[i];
+	}
+	if(Fork()==0){
+		dup2(fd, STDOUT_FILENO);
+		if(execve("../graph/main", argv, NULL)<0){
+			printf("Failed execve: %d\n\n", errno);
+		}
+	}
+	wait(NULL);
+	free(argv);
+	return;
 }
 
 void servestatic(int fd, char *filename, int filesize){

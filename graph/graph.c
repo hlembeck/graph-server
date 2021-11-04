@@ -43,8 +43,10 @@ struct graph *n_wheel(int n){
 		v[i].nlen = 2;
 		struct vertex **nbrs = malloc(sizeof(char *)*2);
 		nbrs[0] = &v[0];
-		if(i!=0)
+		if(i>1)
 			nbrs[1] = &v[i-1];
+		else if(i!=0)
+			nbrs[1] = &v[n-1];
 		else
 			nbrs[1] = &v[n-1];
 		v[i].neighbors = nbrs;
@@ -183,53 +185,6 @@ void printbasicgraphJSON(struct basicgraph g){
 	printf("Content-Length: %ld\r\n", strlen(buf));
 	printf("Content-Type: application/json\r\n\r\n");
 	printf("%s", buf);
-
-	// 23 chars not including ints 
-	/*
-	printf("{\"vertices\":\"["); // 14
-	for(int i=0;i<g.vlen;i++){
-		if(i==g.vlen-1)
-			printf("%d", g.vertices[i]); // 
-		else
-			printf("%d,", g.vertices[i]); // 1
-	}
-	printf("],\"edges\":\"["); // 13
-	for(int i=0;i<g.elen;i++){
-		if(i==g.elen-1)
-			printf("[%d,%d]", g.edges[i].initial, g.edges[i].final); // 3
-		else
-			printf("[%d,%d],", g.edges[i].initial, g.edges[i].final); // 4
-	}
-	printf("]\"}"); // 3
-	*/
-
-	/*
-	sprintf(buf, "HTTP/1.0 200 OK\r\n");
-	sprintf(buf, "%sServer: Lem's Custom Web Server\r\n", buf);
-	sprintf(buf, "%sConnection: close\r\n\r\n", buf);
-	sprintf(buf, "%sContent-Length: %d\r\n", buf, 2);
-	sprintf(buf, "%sContent-Type: text/plain%s\r\n\r\n", buf);
-	//sprintf(buf, "%sContent-Type: application/json\r\n\r\n", buf);
-	sprintf(buf, "%sab", buf);
-	*/
-	/*
-	sprintf(buf, "{vertices:[");
-	for(int i=0;i<g.vlen;i++){
-		if(i==g.vlen-1)
-			sprintf(buf, "%s%d", buf, g.vertices[i]);
-		else
-			sprintf(buf, "%s%d,", buf, g.vertices[i]);
-	}
-	sprintf(buf, "%s],edges:[", buf);
-	for(int i=0;i<g.elen;i++){
-		if(i==g.elen-1)
-			sprintf(buf, "%s[%d,%d]", buf, g.edges[i].initial, g.edges[i].final);
-		else
-			sprintf(buf, "%s[%d,%d],", buf, g.edges[i].initial, g.edges[i].final);
-	}
-	sprintf(buf, "%s]}\n", buf);
-	*/
-	//rio_writen(STDOUT_FILENO, buf, strlen(buf));
 	
 	return;
 }

@@ -160,9 +160,8 @@ void deletebasicgraph(struct basicgraph *g){
 }
 
 void printbasicgraphJSON(struct basicgraph g){
-
-	char buf[16384];
-	memset(buf, '\0', 16384);
+	char buf[10*USHRT_MAX];
+	memset(buf, '\0', 10*USHRT_MAX);
 	sprintf(buf, "{\"vertices\":[");
 	for(int i=0;i<g.vlen;i++){
 		if(i==g.vlen-1)

@@ -92,6 +92,9 @@ void handlePOST(HTTP_Request *hset, int fd){
 		dup2(fd, STDOUT_FILENO);
 		if(execve("../graph/main", argv, NULL)<0){
 			printf("Failed execve: %d\n\n", errno);
+			free(argv);
+			free(hset);
+			exit(-1);
 		}
 	}
 	wait(NULL);

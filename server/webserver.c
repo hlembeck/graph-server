@@ -42,7 +42,7 @@ int main(int argc, char **argv){
 
 void handlereq(int fd){
 	struct stat sbuf;
-	char buf[MAXLINE], uri[MAXLINE], method[MAXLINE];
+	char buf[MAXLINE];
 	char filename[MAXLINE];
 	int ftype;
 	rio_t rio;
@@ -82,15 +82,18 @@ void handleGET(HTTP_Request *hset, int fd){
 }
 
 void handlePOST(HTTP_Request *hset, int fd){
+	//printf("\n\n'%s'\n\n", hset->body);
 	char **argv = malloc(sizeof(char *)*(hset->qlen+2));
-	argv[0] = "../graph/main";
+	argv[0] = "../Graph/server_interface";
+	//argv[0] = "../graph/main";
 	argv[hset->qlen+1] = NULL;
 	for(int i=0;i<hset->qlen;i++){
 		argv[i+1] = hset->query[i];
 	}
 	if(Fork()==0){
 		dup2(fd, STDOUT_FILENO);
-		if(execve("../graph/main", argv, NULL)<0){
+		//if(execve("../graph/main", argv, NULL)<0){
+		if(execve("../Graph/server_interface", argv, NULL)<0){
 			printf("Failed execve: %d\n\n", errno);
 			free(argv);
 			free(hset);

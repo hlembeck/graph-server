@@ -15,8 +15,9 @@ typedef struct HTTP_Request{
 	char *path;
 	char **query;
 	unsigned short qlen;
-	char *version;
 	unsigned short hlen;
+	char *version;
+	char *body;
 	HTTP_Header **headers;
 } HTTP_Request;
 

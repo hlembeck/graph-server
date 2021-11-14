@@ -30,13 +30,18 @@ HTTP_Request *parserequest(rio_t *rio){
 	parse_request_line(line, result);
 	unsigned short i = 0;
 	while(rio_readlineb(rio, line, MAXLINE) > 0){
-		if(strcmp(line, "\r\n") == 0)
+		if(strcmp(line, "\r\n") == 0){
 			break;
+		}
 		headers[i] = parseheader(line);
 		i++;
 	}
 	result->headers = headers;
 	result->hlen = i;
+
+	if(strcmp("POST", result->method)==0){
+		result->body = rio->rio_bufptr;
+	}
 	return result;
 }
 

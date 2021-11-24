@@ -119,8 +119,9 @@ char *getstring(char *input, int *len){
 		*len = -1;
 		return NULL;
 	}
-	result = malloc(sizeof(char)*(*len));
+	result = malloc(sizeof(char)*((*len)+1));
 	memcpy(result,input,*len);
+	result[*len] = '\0';
 	return result;
 }
 
@@ -274,5 +275,30 @@ void print_response_JSON(JSON_Object body){
 	printf("Content-Length: %ld\r\n", strlen(buf));
 	printf("Content-Type: application/json\r\n\r\n");
 	printf("%s", buf);
+	return;
+}
+
+void free_JSON_Object(JSON_Object json){
+	switch(json.type){
+		case 's':
+			free(json.str);
+			break;
+		case 'n':
+			free(json.num);
+			break;
+		case '[':
+			for(int i=0;i<json.len;i++){
+				free_JSON_Object(json.arr[i]);
+			}
+			free(json.arr);
+			break;
+		case '{':
+			for(int i=0;i<json.len;i++){
+				free(json.obj[i].key);
+				free_JSON_Object(json.obj[i].value);
+			}
+			free(json.obj);
+			break;
+	}
 	return;
 }

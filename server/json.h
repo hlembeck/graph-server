@@ -38,3 +38,5 @@ char *getnumber(char *input, int *len);
 void printJSON(JSON_Object input);
 void string_from_JSON(JSON_Object input, char *buf);
 void print_response_JSON(JSON_Object body);
+
+void free_JSON_Object(JSON_Object json);

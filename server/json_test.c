@@ -8,6 +8,7 @@ int main(int argc, char **argv){
 	JSON_Object parsedInput = parseJSON(argv[1]);
 	printf("\n");
 	printJSON(parsedInput);
+	free_JSON_Object(parsedInput);
 	printf("\n");
 	return 0;
 }

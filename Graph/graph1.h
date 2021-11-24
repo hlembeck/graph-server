@@ -1,4 +1,5 @@
 #include "combinatorics.h"
+#include "../server/json.h"
 #include <string.h>
 
 /* An ordered pair of integers. */
@@ -73,3 +74,4 @@ For server interface
 /* Returns JSON-style string of g */
 char *graph1_JSON(graph1 g);
 graph1 *graph1_from_JSON(char *json);
+graph1 *graph1_from_JSON_Object(JSON_Object input);

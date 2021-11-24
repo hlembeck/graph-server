@@ -341,3 +341,16 @@ char are_equal1(graph1 g, graph1 h){
 	return 1;
 }
 
+graph1 *graph1_from_JSON_Object(JSON_Object input){
+	graph1 *ret = malloc(sizeof(graph1));
+	ret->n = atoi(input.obj[0].value.num);
+	directed_edge *edges = malloc(sizeof(directed_edge)*input.obj[1].value.len);
+
+	for(int i=0;i<input.obj[1].value.len;i++){
+		edges[i].initial = atoi(input.obj[1].value.arr[i].arr[0].num);
+		edges[i].final = atoi(input.obj[1].value.arr[i].arr[1].num);
+	}
+	ret->edges = edges;
+	ret->elen = input.obj[1].value.len;
+	return ret;
+}

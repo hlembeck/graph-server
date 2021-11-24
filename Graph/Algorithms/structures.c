@@ -1,4 +1,4 @@
-#include "stack_fifo.h"
+#include "structures.h"
 
 char *pop(stack **s){
 	if(*s){
@@ -78,5 +78,19 @@ void free_fifo(fifo *q){
 	while(q){
 		deq(&q);
 	}
+	return;
+}
+
+sll *init_sll(){
+	dll *list = malloc(sizeof(dll));
+	list.nil = malloc(sizeof(dll_node));
+	nil->np = 0;
+}
+
+void insert_sll(sll *list, int key){
+	dll_node *node = malloc(sizeof(dll_node));
+	node->key = key;
+	node->np = list->nil->np;
+	list->nil->np = node;
 	return;
 }

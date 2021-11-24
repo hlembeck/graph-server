@@ -216,14 +216,6 @@ void print_clique(graph2 g, vertex **clique, unsigned int clen){
 	return;
 }
 
-void reachable_vertices2(graph2_search g, stack **s){
-	vertex_search *curr_vertex = (vertex_search *)(*s)->value;
-	curr_vertex->visited = 1;
-	for(unsigned int i=0;i<curr_vertex->nlen;i++){
-		if(!curr_vertex->neighbors[i]->visited){
-			push(s, (char *)curr_vertex->neighbors[i]);
-			reachable_vertices2(g,s);
-		}
-	}
-	return;
+char is_tree2(graph2 g){
+	
 }

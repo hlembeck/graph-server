@@ -119,17 +119,27 @@ void print_reachable_vertices2_r(graph2_r g, unsigned int initial){
 }
 
 vertex_r *shortest_path2_r(graph2_r g, unsigned int initial, unsigned int final, unsigned int *len){
-	vertex_r *ret, *temp, *v=&g.vertices[initial];
+	*len = 0;
+	vertex_r *ret, *v=&g.vertices[initial];
 	fifo *q = init_fifo((char *)v);
 	v->value = NULL;
 	//v->visited records whether v has been enqueue'd
 	v->visited = 1;
-
 	while(q){
-		printf("test\n");
-		temp = (vertex_r *)deq(&q);
-		if(temp->v_id == final){
-			break;
+		v = (vertex_r *)deq(&q);
+		if(v->v_id == final){
+			ret = v;
+			while(v){
+				v = (vertex_r *)v->value;
+				(*len)++;
+			}
+			v = ret;
+			ret = malloc(sizeof(vertex_r)*(*len));
+			for(unsigned int i=0;i<*len;i++){
+				ret[(*len)-i-1] = *v;
+				v = (vertex_r *)v->value;
+			}
+			return ret;
 		}
 		for(unsigned int i=0;i<v->nlen;i++){
 			//ret acts as temp variable
@@ -138,26 +148,14 @@ vertex_r *shortest_path2_r(graph2_r g, unsigned int initial, unsigned int final,
 				ret->visited = 1;
 				//u->value stores (pointer to) previous vertex
 				ret->value = (char *)v;
-				printf("test\n");
-				enq(q,(char *)ret);
+				if(q){
+					enq(q,(char *)ret);
+				}
+				else{
+					q = init_fifo((char *)ret);
+				}
 			}
 		}
 	}
-
-	/*
-	*len = 0;
-	ret = temp;
-	while(temp->value){
-		temp = (vertex_r *)temp->value;
-		(*len)++;
-	}
-	temp = ret;
-	ret = malloc(sizeof(vertex_r)*(*len));
-	for(unsigned int i=0;i<(*len);i++){
-		ret[i] = *temp;
-		temp = (vertex_r *)temp->value;
-	}
-	*/
-
 	return NULL;
 }

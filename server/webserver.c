@@ -12,6 +12,7 @@ void servenonfile(int fd, char *uri, rio_t *rio, char *method);
 void parse_request(int fd, rio_t *rio);
 void handleGET(HTTP_Request *hset, int fd);
 void handlePOST(HTTP_Request *hset, int fd);
+void handleGraph(HTTP_Request *hset, int fd);
 
 int main(int argc, char **argv){
 	pid_t pid;
@@ -55,7 +56,7 @@ void handlereq(int fd){
 	if(strcmp(hset->method,"GET")==0){
 		handleGET(hset, fd);
 	}
-	else{
+	else if(strcmp(hset->method,"POST")==0){
 		handlePOST(hset, fd);
 	}
 	freerequest(hset);
@@ -82,17 +83,35 @@ void handleGET(HTTP_Request *hset, int fd){
 }
 
 void handlePOST(HTTP_Request *hset, int fd){
-	//printf("\n\n'%s'\n\n", hset->body);
-	char **argv = malloc(sizeof(char *)*(hset->qlen+2));
-	argv[0] = "../Graph/server_interface";
-	//argv[0] = "../graph/main";
-	argv[hset->qlen+1] = NULL;
-	for(int i=0;i<hset->qlen;i++){
-		argv[i+1] = hset->query[i];
+	if(strcmp(hset->path,"/graph")==0){
+		handleGraph(hset,fd);
+		return;
 	}
+	return;
+}
+
+void handleGraph(HTTP_Request *hset, int fd){
+	char **argv;
+	if(hset->body){
+		argv = malloc(sizeof(char *)*(hset->qlen+3));
+		argv[0] = "../Graph/server_interface";
+		argv[hset->qlen+2] = NULL;
+		for(int i=0;i<hset->qlen;i++){
+			argv[i+1] = hset->query[i];
+		}
+		argv[hset->qlen+1] = hset->body;
+	}
+	else{
+		argv = malloc(sizeof(char *)*(hset->qlen+2));
+		argv[0] = "../Graph/server_interface";
+		argv[hset->qlen+1] = NULL;
+		for(int i=0;i<hset->qlen;i++){
+			argv[i+1] = hset->query[i];
+		}
+	}
+	
 	if(Fork()==0){
 		dup2(fd, STDOUT_FILENO);
-		//if(execve("../graph/main", argv, NULL)<0){
 		if(execve("../Graph/server_interface", argv, NULL)<0){
 			printf("Failed execve: %d\n\n", errno);
 			free(argv);

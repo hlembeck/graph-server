@@ -14,4 +14,9 @@
 #define MAXBUF 2048
 #define LISTENQ 0
 
+typedef struct object{
+	char *name;
+	char *value;
+} object;
+
 int open_listenfd(char *port);

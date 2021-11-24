@@ -6,14 +6,12 @@ int main(int argc, char **argv){
 
 	unsigned int len=0;
 	vertex_r *path = shortest_path2_r(*h,0,9,&len);
-	/*
 	for(unsigned int i=0;i<len;i++){
 		printf(" %d", path[i].v_id);
 	}
 	printf("\n");
-	*/
 
-	//free(path);
+	free(path);
 	delete_graph1(g);
 	delete_graph2_r(h);
 	return 0;
